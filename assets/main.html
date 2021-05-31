@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Telegram Index</title>
+    <link href="https://img.icons8.com/fluent/84/000000/telegram-app.png" rel="icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .badge {
+            font-weight: normal;
+            font-size: 8px;
+            padding: 3px 5px;
+        }
+        .badge-left {
+            border-radius: 3px 0 0 3px;
+        }
+        .badge-right {
+            border-radius: 0 3px 3px 0;
+            background-color: #ededed;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="https://telegram.org">
+                <img width="38" src="https://img.icons8.com/fluent/144/000000/telegram-app.png" />
+                Telegram Index
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="https://viperadnan-git.github.io">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-3">
+        <div class="card my-2 shadow">
+            <div class="card-body">
+                <h5 class="card-title">Telegram Indexer</h5>
+                <div>
+                    A simple website to <strong>Index</strong> and <strong>Download</strong> Telegram Files in browsers, just enter the chat or message link below and click on go.
+                </div>
+                <div id="alert-div" style="display:none" class="alert alert-warning mt-2">
+                    <strong>Oops!</strong><div id="alert-message"></div>
+                </div>
+                <form id="tg-url-form" class="d-flex mt-2">
+                    <input id="tg-url-input" class="form-control me-2" type="url" placeholder="Enter Telegram Link" aria-label="submit-url" required>
+                    <button type="submit" class="btn btn-primary">Go</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer class="d-flex fixed-bottom justify-content-center mb-3">
+        <a href="https://viperadnan-git.github.io"><span class="badge bg-dark badge-left">viperadnan</span><span class="badge text-dark badge-right">&lt;&sol;&gt;</span></a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script>
+        $("#tg-url-form").submit((event) => {
+            event.preventDefault()
+            let url = $("#tg-url-input").val().split("/");
+            if (url.length == 5) {
+                $.ajax({
+                    "url": `/check/${url[3]}/${url[4]}`,
+                    "method": "GET",
+                    "timeout": 0
+                }).done((response) => {
+                    $("#tg-url-input").val("");
+                    window.location.href = `/preview/${url[3]}/${url[4]}`;
+                }).fail((xhr, status, err) => {
+                    $("#alert-message").text(xhr.responseText);
+                    $("#alert-div").show("slow");
+                    sleep(3000).then(() => {
+                        $("#alert-div").hide("slow");
+                    });
+                });
+            } else if (url.length == 4) {
+                window.location.href = "/" + url[3];
+            } else {
+                $("#alert-message").text("Invalid Telegram message link provided.");
+                $("#alert-div").show("slow");
+                sleep(3000).then(() => {
+                    $("#alert-div").hide("slow");
+                });
+            }
+        });
+        function sleep (time) {
+            return new Promise((resolve) => setTimeout(resolve, time));
+        }
+    </script>
+</body>
+</html>

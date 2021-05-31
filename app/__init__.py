@@ -13,6 +13,7 @@ except KeyError as err:
     print("Set Telegram API_ID and API_HASH variables.")
     sys.exit()
 
+results_per_page = environ.get("RESULTS_PER_PAGE", 20)
 tg_session = environ.get("TG_SESSION", None)
 bot_token = environ.get("BOT_TOKEN", None)
 
@@ -23,3 +24,4 @@ elif bot_token:
 else:
     print("Set either TG_SESSION or BOT_TOKEN variable")
     sys.exit()
+client.parse_mode = "html"

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://img.icons8.com/fluent/84/000000/telegram-app.png" rel="icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <title>{{message_type}} Preview</title>
+    <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        code {
+            color: #000000;
+        }
+        .card {
+            border-radius: 8px 8px 7px 7px;
+        }
+        .card-img-top {
+            border-radius: 8px 8px 0 0;
+        }
+        .plyr {
+            border-radius: 8px 8px 0 0;
+        }
+        .badge-small {
+            font-weight: normal;
+            font-size: 8px;
+            padding: 3px 5px;
+        }
+        .badge-left {
+            border-radius: 3px 0 0 3px;
+        }
+        .badge-right {
+            border-radius: 0 3px 3px 0;
+            background-color: #ededed;
+        }
+    </style>
+</head>
+<body>
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="https://t.me{{id}}">
+                <img width="38" src="https://img.icons8.com/fluent/144/000000/telegram-app.png" />
+                {{message_type}} Preview
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" onclick="window.location.href = '/' + '{{id}}'.split('/')[1]">Chat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="https://viperadnan-git.github.io">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+        </symbol>
+        <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+        </symbol>
+    </svg>
+    <div class="container my-3">
+        <div class="card m-4 border-white shadow-lg">
+            {% if file %}
+            {% if 'image' in file.mime_type %}
+            <img class="card-img-top" alt="thumbnail.png" src="{{id}}">
+            {% elif 'video' in file.mime_type %}
+            <video id="player" playsinline controls data-poster="/thumbnail{{id}}">
+                <source src="{{id}}" type="{{file.mime_type}}" />
+            </video>
+            {% elif 'audio' in file.mime_type %}
+            <audio id="player" controls>
+                <source src="{{id}}" type="{{file.mime_type}}" />
+            </audio>
+            {% else %}
+            <img class="card-img-top" alt="thumbnail.png" src="/thumbnail{{id}}">
+            {% endif %}
+            {% endif %}
+            <div class="card-body">
+                {% if message %}
+                <div>
+                    {{message|safe}}
+                </div>
+                {% endif %}
+                {% if buttons %}
+                <div class="mt-3 text-center">
+                    {% for row in buttons %}
+                    <div class="mt-1">
+                        {% for btn in row %}
+                        <a class="btn btn-sm btn-outline-dark w-auto" href="{{ btn.url }}" target="_blank">{{btn.text}}</a>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% if file %}
+            <div class="card-footer text-muted text-center small">
+                <small>{{file.file_name}}</small>
+                <br>
+                <small>{{file.file_size}} &mdash; {{file.file_ext}} &mdash; </small><a class="text-decoration-none small" href="{{id}}">DOWNLOAD</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="d-flex justify-content-center my-3">
+        <a href="https://viperadnan-git.github.io"><span class="badge badge-small bg-dark badge-left">viperadnan</span><span class="badge badge-small badge-right text-dark">&lt;&sol;&gt;</span></a>
+    </footer>
+    <script>
+        const player = new Plyr('#player');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://img.icons8.com/fluent/84/000000/telegram-app.png" rel="icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <title>{{chat_title}}</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        code {
+            color: #000000;
+        }
+        .card {
+            border-radius: 8px 8px 7px 7px;
+        }
+        .card-img-top {
+            border-radius: 8px 8px 0 0;
+        }
+        .badge-small {
+            font-weight: normal;
+            font-size: 8px;
+            padding: 3px 5px;
+        }
+        .badge-left {
+            border-radius: 3px 0 0 3px;
+        }
+        .badge-right {
+            border-radius: 0 3px 3px 0;
+            background-color: #ededed;
+        }
+    </style>
+</head>
+<body>
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" onclick="open_tg()">
+                <img width="38" src="https://img.icons8.com/fluent/144/000000/telegram-app.png" />
+                {{chat_title}}
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="https://viperadnan-git.github.io">Contact</a>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <input class="form-control me-2" value="{% if search %} {{search}} {% endif %}" type="search" name="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-primary" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+        </symbol>
+        <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+        </symbol>
+    </svg>
+    <div class="container my-3">
+        {% if items %}
+        {% if search %}
+        <div class="alert alert-success d-flex align-items-center shadow">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24"><use xlink:href="#check-circle-fill" /></svg>
+            <div class="fw-bold">
+                Search results for - {{search}}
+            </div>
+        </div>
+        {% endif %}
+        {% for item in items %}
+        <div class="card m-3 border-white shadow" onclick="window.location.href = '/preview' + '{{item.id}}'">
+            {% if item.file %}
+            <img class="card-img-top" alt="thumbnail.png" src="/thumbnail{{item.id}}">
+            {% if item.message %}
+            <div class="card-body">
+                <div>
+                    {{item.message|safe}}
+                </div>
+            </div>
+            {% endif %}
+            <div class="card-footer text-muted text-center small">
+                <small>{{item.file.file_size}} &mdash; {{item.file.file_ext}} &mdash; </small><a class="text-decoration-none small" href="{{item.id}}">DOWNLOAD</a>
+            </div>
+            {% else %}
+            <div class="card-body">
+                {{item.message|safe}}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <div class="d-flex justify-content-center mt-3">
+            <span class="badge rounded-pill bg-warning text-dark">
+                Total {{items|length}} Items
+            </span>
+        </div>
+        <ul class="pagination justify-content-center mt-3">
+            {% if prev_page %}
+            <li class="page-item"><a title="Previous page" class="page-link" href="{{prev_page.url}}">&laquo;</a></li>
+            <li class="page-item"><a title="Previous page" class="page-link" href="{{prev_page.url}}">{{prev_page.no}}</a></li>
+            {% endif %}
+            <li class="page-item active"><a class="page-link" href="#navbar">{{cur_page}}</a></li>
+            {% if next_page %}
+            <li class="page-item"><a title="Next page" class="page-link" href="{{next_page.url}}">{{next_page.no}}</a></li>
+            <li class="page-item"><a title="Next page" class="page-link" href="{{next_page.url}}">&raquo;</a></li>
+            {% endif %}
+        </ul>
+        {% else %}
+        <div class="alert alert-warning d-flex align-items-center shadow">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24"><use xlink:href="#exclamation-triangle-fill" /></svg>
+            <div class="fw-bold">
+                No messages to display
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+    <footer class="d-flex justify-content-center my-3">
+        <a href="https://viperadnan-git.github.io"><span class="badge badge-small bg-dark badge-left">viperadnan</span><span class="badge badge-small badge-right text-dark">&lt;&sol;&gt;</span></a>
+    </footer>
+    <script>
+        function open_tg() {
+            window.location.href = "https://t.me/" + window.location.pathname;
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
+</body>
+</html>
