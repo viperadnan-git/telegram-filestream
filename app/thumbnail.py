@@ -3,19 +3,19 @@ from PIL import Image
 from app import client
 from aiohttp import web
 from telethon.tl import types
-
+from app.utils import parseInt
 
 async def get_thumbnail(req):
-    message_id = int(req.match_info["id"])
+    chat_id = parseInt(req.match_info['chat'])
     try:
-        chat_id = req.match_info['chat']
+        message_id = int(req.match_info["id"])
     except ValueError:
         return web.Response(status=400, text="400: Bad Request")
     
     try:
         message = await client.get_messages(entity=chat_id, ids=message_id)
     except:
-        print(f"Error in getting message {file_id} in {chat_id}")
+        print(f"Error in getting message {message_id} in {chat_id}")
         message = None
 
     if not message or not message.file:

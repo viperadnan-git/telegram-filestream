@@ -2,7 +2,7 @@ import math
 import asyncio
 from telethon import utils
 from telethon.tl import types
-from app.utils import humanbytes, get_file_name, get_chat_name
+from app.utils import humanbytes, get_file_name
 from app import client, results_per_page
 
 
@@ -37,7 +37,7 @@ async def get_chat_messages(chat_id, offset:int, search_query=None):
             }
         if entry:
             results.append(entry)
-    return results, await get_chat_name(messages, chat_id)
+    return results, getattr(messages[0].chat, "title", getattr(messages[0].chat, "first_name", chat_id)) if len(messages) > 0 else chat_id 
 
 async def get_message(chat_id, message_id:int):
     try:
@@ -89,12 +89,13 @@ async def download(file, file_size, offset, limit):
             async for chunk in client.iter_download(file, offset=first_part * part_size, request_size=part_size):
                 if part == first_part:
                     yield chunk[first_part_cut:]
-                elif part == last_part-1:
+                elif part == last_part:
                     yield chunk[:last_part_cut]
                 else:
                     yield chunk
+                #print(f"Part {part}/{last_part} (total {part_count}) served!")
                 part += 1
-            print("Serving Finished")
+            print("Serving finished !")
         except (GeneratorExit, StopAsyncIteration, asyncio.CancelledError):
             print("File serve interrupted")
             raise

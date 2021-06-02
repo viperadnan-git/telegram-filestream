@@ -12,6 +12,7 @@
             color: #000000;
         }
         .card {
+            border: none;
             border-radius: 8px 8px 7px 7px;
         }
         .card-img-top {
@@ -34,7 +35,7 @@
 <body>
     <nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" onclick="open_tg()">
+            <a class="navbar-brand" href="{{id}}">
                 <img width="38" src="https://img.icons8.com/fluent/144/000000/telegram-app.png" />
                 {{chat_title}}
             </a>
@@ -50,9 +51,9 @@
                         <a class="nav-link active" href="https://viperadnan-git.github.io">Contact</a>
                     </li>
                 </ul>
-                <form class="d-flex">
-                    <input class="form-control me-2" value="{% if search %} {{search}} {% endif %}" type="search" name="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-primary" type="submit">Search</button>
+                <form class="d-flex ms-auto">
+                    <input class="form-control form-control-sm bg-transparent text-white me-2" value="{% if search %} {{search}} {% endif %}" type="search" name="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-sm btn-outline-primary" type="submit">Search</button>
                 </form>
             </div>
         </div>
@@ -75,27 +76,31 @@
             </div>
         </div>
         {% endif %}
-        {% for item in items %}
-        <div class="card m-3 border-white shadow" onclick="window.location.href = '/preview' + '{{item.id}}'">
-            {% if item.file %}
-            <img class="card-img-top" alt="thumbnail.png" src="/thumbnail{{item.id}}">
-            {% if item.message %}
-            <div class="card-body">
-                <div>
-                    {{item.message|safe}}
+        <div class="row mx-1 row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-6">
+            {% for item in items %}
+            <div class="col mx-auto my-2">
+                <div class="card border-white shadow" onclick="window.location.href = '{{item.id}}'">
+                    {% if item.file %}
+                    <img class="card-img-top" alt="thumbnail.png" src="/thumbnail{{item.id}}">
+                    {% if item.message %}
+                    <div class="card-body">
+                        <div>
+                            {{item.message|safe}}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="card-footer text-muted text-center small">
+                        <small>{{item.file.file_size}} &mdash; {{item.file.file_ext}} &mdash; </small><a class="text-decoration-none small" href="/download{{item.id}}">DOWNLOAD</a>
+                    </div>
+                    {% else %}
+                    <div class="card-body">
+                        {{item.message|safe}}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-            {% endif %}
-            <div class="card-footer text-muted text-center small">
-                <small>{{item.file.file_size}} &mdash; {{item.file.file_ext}} &mdash; </small><a class="text-decoration-none small" href="{{item.id}}">DOWNLOAD</a>
-            </div>
-            {% else %}
-            <div class="card-body">
-                {{item.message|safe}}
-            </div>
-            {% endif %}
+            {% endfor %}
         </div>
-        {% endfor %}
         <div class="d-flex justify-content-center mt-3">
             <span class="badge rounded-pill bg-warning text-dark">
                 Total {{items|length}} Items
@@ -125,11 +130,6 @@
     <footer class="d-flex justify-content-center my-3">
         <a href="https://viperadnan-git.github.io"><span class="badge badge-small bg-dark badge-left">viperadnan</span><span class="badge badge-small badge-right text-dark">&lt;&sol;&gt;</span></a>
     </footer>
-    <script>
-        function open_tg() {
-            window.location.href = "https://t.me/" + window.location.pathname;
-        }
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
 </body>
 </html>

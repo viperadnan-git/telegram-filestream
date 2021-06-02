@@ -59,6 +59,13 @@
                     <button type="submit" class="btn btn-primary">Go</button>
                 </form>
             </div>
+            {% if chats %}
+            <ol class="list-group list-group-flush">
+                {% for chat in chats %}
+                <a href="/{{chat.chat_id}}" class="list-group-item list-group-item-action">{{chat.title}}</a>
+                {% endfor %}
+            </ol>
+            {% endif %}
         </div>
     </div>
     <footer class="d-flex fixed-bottom justify-content-center mb-3">
@@ -76,7 +83,7 @@
                     "timeout": 0
                 }).done((response) => {
                     $("#tg-url-input").val("");
-                    window.location.href = `/preview/${url[3]}/${url[4]}`;
+                    window.location.href = `/${url[3]}/${url[4]}`;
                 }).fail((xhr, status, err) => {
                     $("#alert-message").text(xhr.responseText);
                     $("#alert-div").show("slow");

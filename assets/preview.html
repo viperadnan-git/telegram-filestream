@@ -14,6 +14,7 @@
             color: #000000;
         }
         .card {
+            border: none;
             border-radius: 8px 8px 7px 7px;
         }
         .card-img-top {
@@ -39,7 +40,7 @@
 <body>
     <nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="https://t.me{{id}}">
+            <a class="navbar-brand" onclick="window.location.href = '/' + '{{id}}'.split('/')[1]">
                 <img width="38" src="https://img.icons8.com/fluent/144/000000/telegram-app.png" />
                 {{message_type}} Preview
             </a>
@@ -49,7 +50,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" onclick="window.location.href = '/' + '{{id}}'.split('/')[1]">Chat</a>
+                        <a class="nav-link active" href="https://t.me{{id}}">Open in Telegram</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="https://viperadnan-git.github.io">Contact</a>
@@ -70,14 +71,14 @@
         <div class="card m-4 border-white shadow-lg">
             {% if file %}
             {% if 'image' in file.mime_type %}
-            <img class="card-img-top" alt="thumbnail.png" src="{{id}}">
+            <img class="card-img-top" alt="thumbnail.png" src="/download{{id}}">
             {% elif 'video' in file.mime_type %}
             <video id="player" playsinline controls data-poster="/thumbnail{{id}}">
-                <source src="{{id}}" type="{{file.mime_type}}" />
+                <source src="/download{{id}}" type="{{file.mime_type}}" />
             </video>
             {% elif 'audio' in file.mime_type %}
             <audio id="player" controls>
-                <source src="{{id}}" type="{{file.mime_type}}" />
+                <source src="/download{{id}}" type="{{file.mime_type}}" />
             </audio>
             {% else %}
             <img class="card-img-top" alt="thumbnail.png" src="/thumbnail{{id}}">
@@ -105,7 +106,7 @@
             <div class="card-footer text-muted text-center small">
                 <small>{{file.file_name}}</small>
                 <br>
-                <small>{{file.file_size}} &mdash; {{file.file_ext}} &mdash; </small><a class="text-decoration-none small" href="{{id}}">DOWNLOAD</a>
+                <small>{{file.file_size}} &mdash; {{file.file_ext}} &mdash; </small><a class="text-decoration-none small" href="/download{{id}}">DOWNLOAD</a>
             </div>
             {% endif %}
         </div>

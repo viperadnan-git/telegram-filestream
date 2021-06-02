@@ -7,7 +7,7 @@ from app.telegram import get_chat_messages
 
 @aiohttp_jinja2.template("index.html")
 async def index_chat(req):
-    chat_id = await parseInt(req.match_info["chat"])
+    chat_id = parseInt(req.match_info["chat"])
     
     try:
         offset = int(req.query.get('page', '1'))
@@ -21,7 +21,8 @@ async def index_chat(req):
     
     try:
         results, chat = await get_chat_messages(chat_id, offset_val, search_query)
-    except:
+    except Exception as err:
+        print(f"Chat {chat_id} not found")
         return web.HTTPFound("/")
     
     prev_page = False

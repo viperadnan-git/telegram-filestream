@@ -6,7 +6,7 @@ from app.telegram import get_message
 
 
 async def check_file(req):
-    chat_id = await parseInt(req.match_info.get("chat", None))
+    chat_id = parseInt(req.match_info["chat"])
     try:
         message_id = int(req.match_info.get("id", None))
     except ValueError as err:
@@ -24,7 +24,7 @@ async def check_file(req):
 
 @aiohttp_jinja2.template("preview.html")
 async def index_message(req):
-    chat_id = await parseInt(req.match_info["chat"])
+    chat_id = parseInt(req.match_info["chat"])
     try:
         message_id = int(req.match_info["id"])
     except Exception as err:

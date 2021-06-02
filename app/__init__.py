@@ -13,6 +13,7 @@ except KeyError as err:
     print("Set Telegram API_ID and API_HASH variables.")
     sys.exit()
 
+recommendations = list(set(x for x in environ.get("RECOMMENDATIONS", "").split()))
 results_per_page = environ.get("RESULTS_PER_PAGE", 20)
 tg_session = environ.get("TG_SESSION", None)
 bot_token = environ.get("BOT_TOKEN", None)
