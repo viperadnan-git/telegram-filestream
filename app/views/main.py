@@ -5,7 +5,7 @@ from app import announcement
 @aiohttp_jinja2.template("main.html")
 async def Main(request):
     return {
-        "chats": request.app["chat_recommendations"],
+        "chats": list(request.app["chats"].values()),
         "auth" : request.app["auth"],
         "announcement" : announcement
     }

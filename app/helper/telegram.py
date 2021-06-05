@@ -3,13 +3,14 @@ import asyncio
 from telethon import utils
 from telethon.tl import types
 from app import client, results_per_page
-from app.helper.utils import humanbytes, get_file_name
+from app.helper.utils import humanbytes, get_file_name, get_chat_name
 
 
-async def get_chat_messages(chat_id, offset:int, search_query=None):
+async def get_chat_messages(chat, offset:int, search_query=None):
     results = []
+    alias_id = chat['alias_id']
     kwargs = {
-        'entity': chat_id,
+        'entity': chat['chat_id'],
         'limit': results_per_page,
         'add_offset': results_per_page*offset
     }
@@ -21,7 +22,7 @@ async def get_chat_messages(chat_id, offset:int, search_query=None):
         entry = None
         if msg.file and not isinstance(msg.media, types.MessageMediaWebPage):
             entry = {
-                'id' : f"/{chat_id}/{msg.id}",
+                'id' : f"/{alias_id}/{msg.id}",
                 'message' : msg.text.replace('\n','<br>'),
                 'file' : {
                     'mime_type' : msg.file.mime_type,
@@ -31,16 +32,17 @@ async def get_chat_messages(chat_id, offset:int, search_query=None):
             }
         elif msg.message:
             entry = {
-                'id' : f"/{chat_id}/{msg.id}",
+                'id' : f"/{alias_id}/{msg.id}",
                 'message' : msg.text.replace('\n','<br>'),
                 'file' : False
             }
         if entry:
             results.append(entry)
-    return results, getattr(messages[0].chat, "title", getattr(messages[0].chat, "first_name", chat_id)) if len(messages) > 0 else chat_id 
+    return results
 
-async def get_message(chat_id, message_id:int):
-    message = await client.get_messages(entity=chat_id, ids=message_id)
+async def get_message(chat, message_id:int):
+    message = await client.get_messages(entity=chat['chat_id'], ids=message_id)
+    alias_id = chat['alias_id']
     reply_btns = []
     if message.reply_markup:
         if isinstance(message.reply_markup, types.ReplyInlineMarkup):
@@ -52,7 +54,7 @@ async def get_message(chat_id, message_id:int):
                 reply_btns.append(btns)
     if message.media and not isinstance(message.media, types.MessageMediaWebPage):
         return {
-            "id" : f"/{chat_id}/{message.id}",
+            "id" : f"/{alias_id}/{message.id}",
             "message_type" : "Media",
             "message" : message.text.replace('\n', '<br>'),
             "buttons" : reply_btns,
@@ -65,13 +67,13 @@ async def get_message(chat_id, message_id:int):
         }
     else:
         return {
-            "id" : f"/{chat_id}/{message.id}",
+            "id" : f"/{alias_id}/{message.id}",
             "message_type" : "Message",
             "message" : message.text.replace('\n', '<br>'),
             "buttons" : reply_btns,
             "file" : False
         }
-        
+
 
 async def download(file, file_size, offset, limit):
         part_size_kb = utils.get_appropriated_part_size(file_size)

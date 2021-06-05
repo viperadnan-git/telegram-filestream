@@ -1,6 +1,6 @@
 import sys
-import json
 from os import environ
+from json import loads as json_load, JSONDecodeError
 from telethon.sync import TelegramClient
 from telethon.sessions import StringSession
 
@@ -14,7 +14,15 @@ except KeyError as err:
     print("Set TELEGRAM_API and TELEGRAM_HASH variables.")
     sys.exit()
 
-recommendations = list(set(x for x in environ.get("RECOMMENDATIONS", "").split()))
+try:
+    tg_settings = json_load(environ.get("TELEGRAM_SETTINGS"))
+    if not len(tg_settings.keys()) == 6:
+        print("TELEGRAM_SETTINGS have some missing keys. Add all of them before running.")
+        sys.exit()
+except (JSONDecodeError, TypeError):
+    print("Set TELEGRAM_SETTINGS Variable to a valid JSON Format.")
+    sys.exit()
+
 results_per_page = environ.get("RESULTS_PER_PAGE", 20)
 tg_session = environ.get("TELEGRAM_SESSION", None)
 bot_token = environ.get("BOT_TOKEN", None)
@@ -32,7 +40,7 @@ client.parse_mode = "html"
 authorization = environ.get("AUTH", None)
 if authorization:
     try:
-        authorization = json.loads(authorization)
+        authorization = json_load(authorization)
         if len(authorization.items()) == 1:
             authorization = {"_":list(authorization.values())[0]}
     except:

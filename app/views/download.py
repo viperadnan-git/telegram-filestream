@@ -1,7 +1,7 @@
 from app import client
 from aiohttp import web
 from app.helper.telegram import download
-from app.helper.utils import get_file_name, parseInt
+from app.helper.utils import get_file_name, parseChat
 from telethon.tl import types
 
 
@@ -13,7 +13,11 @@ class Download(web.View):
         return await self.handle_request(head=True)
 
     async def handle_request(self, head=False):
-        chat_id = await parseInt(self.request.match_info["chat"])
+        try:
+            chat_id = (await parseChat(self.request))['chat_id']
+        except:
+            return web.HTTPFound("/")
+       
         try:
             message_id = int(self.request.match_info["id"])
         except:

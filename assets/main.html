@@ -65,20 +65,13 @@
             <div class="card-body">
                 <h5 class="card-title">
                     <img width="21" class="mb-1" src="https://img.icons8.com/color/144/000000/overview-pages-4.png" />
-                    Telegram Indexer
+                    Web List
                 </h5>
-                <div>
-                    A simple website to <strong>Index</strong> and <strong>Download</strong> Telegram Files in browsers, just enter the chat or message link below and click on go.
-                </div>
-                <form id="tg-url-form" class="d-flex mt-2">
-                    <input id="tg-url-input" class="form-control me-2" type="url" placeholder="Enter telegram link" aria-label="submit-url" required>
-                    <button type="submit" class="btn btn-primary">Go</button>
-                </form>
             </div>
             {% if chats %}
             <ol class="list-group list-group-flush">
                 {% for chat in chats %}
-                <a href="/{{chat.chat_id}}" class="list-group-item list-group-item-action">{{chat.title}}</a>
+                <a href="/{{chat.alias_id}}" class="list-group-item list-group-item-action">{{chat.title}}</a>
                 {% endfor %}
             </ol>
             {% endif %}
@@ -94,61 +87,5 @@
         announcementToast.show();
     </script>
     {% endif %}
-    <script>
-        const TOAST_CONTAINER = document.createElement("div");
-        TOAST_CONTAINER.id = "toastContainer";
-        TOAST_CONTAINER.className = "toast-container position-fixed bottom-0 end-0 m-2";
-        TOAST_CONTAINER.setAttribute("aria-live", "polite");
-        TOAST_CONTAINER.style.zIndex = 1081;
-        document.body.appendChild(TOAST_CONTAINER);
-
-        const TOAST_TEMPLATE = document.createElement("div");
-        TOAST_TEMPLATE.className = "toast align-items-center";
-        TOAST_TEMPLATE.setAttribute("role", "status");
-        TOAST_TEMPLATE.setAttribute("aria-live", "polite");
-        TOAST_TEMPLATE.setAttribute("aria-atomic", "true");
-        TOAST_TEMPLATE.innerHTML = `
-        <div class="d-flex">
-        <div class="toast-body"></div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>`;
-
-        function Notify(text, style = null) {
-            let toast = TOAST_TEMPLATE.cloneNode(true);
-            let toastTitle = toast.querySelector(".toast-body");
-            toastTitle.innerText = text;
-            if (style) {
-                toast.className += ` ${style}`;
-            }
-            TOAST_CONTAINER.appendChild(toast);
-            var bsToast = new bootstrap.Toast(toast);
-            bsToast.show();
-            toast.addEventListener('hidden.bs.toast', () => {
-                TOAST_CONTAINER.removeChild(toast);
-            });
-        }
-    </script>
-    <script>
-        $("#tg-url-form").submit((event) => {
-            event.preventDefault()
-            let url = $("#tg-url-input").val().split("/");
-            if (url.length == 5) {
-                $.ajax({
-                    "url": `/${url[3]}/${url[4]}`,
-                    "method": "POST",
-                    "timeout": 0
-                }).done((response) => {
-                    $("#tg-url-input").val("");
-                    window.location.href = `/${url[3]}/${url[4]}`;
-                }).fail((xhr, status, err) => {
-                    Notify(xhr.responseText, "bg-danger text-white");
-                });
-            } else if (url.length == 4) {
-                window.location.href = "/" + url[3];
-            } else {
-                Notify("Invalid Telegram message link provided.", "bg-danger text-white");
-            }
-        });
-    </script>
 </body>
 </html>

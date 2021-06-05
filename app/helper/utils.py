@@ -1,5 +1,6 @@
 import hmac
 import hashlib
+import secrets
 from app import secret_key
 
 algorithm = hashlib.sha256
@@ -12,11 +13,8 @@ async def verify(signature: str, data: str) -> bool:
         raise ValueError(f"Invalid signature for {data}")
     return True
 
-async def parseInt(str):
-    try:
-        return int(str)
-    except ValueError as err:
-        return str
+async def parseChat(req):
+    return req.app['chats'][req.match_info['chat']]
 
 async def get_file_name(message):
     if message.file.name:         
@@ -31,3 +29,19 @@ async def humanbytes(file_size):
         if abs(file_size) < base:
             return f"{round(file_size, 2)} {unit}"
         file_size /= base
+
+async def get_chat_name(chat):
+    return getattr(
+            chat,
+            "title",
+            getattr(chat,
+            "first_name",
+            "Chat")
+        )
+
+async def generate_alias(chat):
+    return {
+        'chat_id':chat.id,
+        'alias_id':secrets.token_urlsafe(8),
+        'title':await get_chat_name(chat)
+    }

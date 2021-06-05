@@ -1,20 +1,23 @@
 import aiohttp_jinja2
 from aiohttp import web
-from app.helper.utils import parseInt
+from app.helper.utils import parseChat
 from app import client, results_per_page
 from app.helper.telegram import get_chat_messages
 
 
 class IndexChat(web.View):
     async def post(self):
-        chat = parseInt(self.request.match_info["chat"])
+        chat = await parseChat(self.request)
         return web.HTTPFound("/"+chat_id)
 
     
     @aiohttp_jinja2.template("index.html")
     async def get(self):
-        chat_id = await parseInt(self.request.match_info["chat"])
-    
+        try:
+            chat = await parseChat(self.request)
+        except:
+            return web.HTTPFound("/")
+        
         try:
             offset = int(self.request.query.get('page', '1'))
         except:
@@ -26,9 +29,9 @@ class IndexChat(web.View):
         offset_val = 0 if offset <=1 else offset-1
     
         try:
-            results, chat = await get_chat_messages(chat_id, offset_val, search_query)
+            results = await get_chat_messages(chat, offset_val, search_query)
         except Exception as err:
-            print(f"Chat {chat_id} not found")
+            print(f"Chat {chat['chat_id']} not found")
             return web.HTTPFound("/")
     
         prev_page = False
@@ -52,8 +55,8 @@ class IndexChat(web.View):
             }
     
         return {
-            'chat_title': chat,
-            'items':results,
+            'chat_title': chat['title'],
+            'items': results,
             'prev_page': prev_page,
             'next_page': next_page,
             'cur_page' : offset,

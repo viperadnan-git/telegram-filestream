@@ -3,10 +3,15 @@ from PIL import Image
 from app import client
 from aiohttp import web
 from telethon.tl import types
-from app.helper.utils import parseInt
+from app.helper.utils import parseChat
 
 async def get_thumbnail(req):
-    chat_id = await parseInt(req.match_info['chat'])
+    try:
+        chat_id = (await parseChat(req))['chat_id']
+    except Exception as err:
+        print(err)
+        return web.HTTPFound("/")
+    
     try:
         message_id = int(req.match_info["id"])
     except ValueError:
