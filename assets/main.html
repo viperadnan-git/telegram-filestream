@@ -40,22 +40,38 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="https://viperadnan-git.github.io">Contact</a>
                     </li>
+                    {% if auth %}
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/api/logout">Log Out</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
-    <div class="container mt-3">
+    <div class="container mt-2">
+        {% if announcement %}
+        <div id="announcement" class="toast hide w-100" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header">
+                <img src="https://img.icons8.com/cotton/84/000000/commercial--v1.png" width="24" class="rounded me-2">
+                <strong class="me-auto">Announcement</strong>
+            </div>
+            <div class="toast-body">
+                {{announcement|safe}}
+            </div>
+        </div>
+        {% endif %}
         <div class="card my-2 shadow">
             <div class="card-body">
-                <h5 class="card-title">Telegram Indexer</h5>
+                <h5 class="card-title">
+                    <img width="21" class="mb-1" src="https://img.icons8.com/color/144/000000/overview-pages-4.png" />
+                    Telegram Indexer
+                </h5>
                 <div>
                     A simple website to <strong>Index</strong> and <strong>Download</strong> Telegram Files in browsers, just enter the chat or message link below and click on go.
                 </div>
-                <div id="alert-div" style="display:none" class="alert alert-warning mt-2">
-                    <strong>Oops!</strong><div id="alert-message"></div>
-                </div>
                 <form id="tg-url-form" class="d-flex mt-2">
-                    <input id="tg-url-input" class="form-control me-2" type="url" placeholder="Enter Telegram Link" aria-label="submit-url" required>
+                    <input id="tg-url-input" class="form-control me-2" type="url" placeholder="Enter telegram link" aria-label="submit-url" required>
                     <button type="submit" class="btn btn-primary">Go</button>
                 </form>
             </div>
@@ -72,38 +88,67 @@
         <a href="https://viperadnan-git.github.io"><span class="badge bg-dark badge-left">viperadnan</span><span class="badge text-dark badge-right">&lt;&sol;&gt;</span></a>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    {% if announcement %}
+    <script>
+        var announcementToast = new bootstrap.Toast(document.getElementById('announcement'));
+        announcementToast.show();
+    </script>
+    {% endif %}
+    <script>
+        const TOAST_CONTAINER = document.createElement("div");
+        TOAST_CONTAINER.id = "toastContainer";
+        TOAST_CONTAINER.className = "toast-container position-fixed bottom-0 end-0 m-2";
+        TOAST_CONTAINER.setAttribute("aria-live", "polite");
+        TOAST_CONTAINER.style.zIndex = 1081;
+        document.body.appendChild(TOAST_CONTAINER);
+
+        const TOAST_TEMPLATE = document.createElement("div");
+        TOAST_TEMPLATE.className = "toast align-items-center";
+        TOAST_TEMPLATE.setAttribute("role", "status");
+        TOAST_TEMPLATE.setAttribute("aria-live", "polite");
+        TOAST_TEMPLATE.setAttribute("aria-atomic", "true");
+        TOAST_TEMPLATE.innerHTML = `
+        <div class="d-flex">
+        <div class="toast-body"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>`;
+
+        function Notify(text, style = null) {
+            let toast = TOAST_TEMPLATE.cloneNode(true);
+            let toastTitle = toast.querySelector(".toast-body");
+            toastTitle.innerText = text;
+            if (style) {
+                toast.className += ` ${style}`;
+            }
+            TOAST_CONTAINER.appendChild(toast);
+            var bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            toast.addEventListener('hidden.bs.toast', () => {
+                TOAST_CONTAINER.removeChild(toast);
+            });
+        }
+    </script>
     <script>
         $("#tg-url-form").submit((event) => {
             event.preventDefault()
             let url = $("#tg-url-input").val().split("/");
             if (url.length == 5) {
                 $.ajax({
-                    "url": `/check/${url[3]}/${url[4]}`,
-                    "method": "GET",
+                    "url": `/${url[3]}/${url[4]}`,
+                    "method": "POST",
                     "timeout": 0
                 }).done((response) => {
                     $("#tg-url-input").val("");
                     window.location.href = `/${url[3]}/${url[4]}`;
                 }).fail((xhr, status, err) => {
-                    $("#alert-message").text(xhr.responseText);
-                    $("#alert-div").show("slow");
-                    sleep(3000).then(() => {
-                        $("#alert-div").hide("slow");
-                    });
+                    Notify(xhr.responseText, "bg-danger text-white");
                 });
             } else if (url.length == 4) {
                 window.location.href = "/" + url[3];
             } else {
-                $("#alert-message").text("Invalid Telegram message link provided.");
-                $("#alert-div").show("slow");
-                sleep(3000).then(() => {
-                    $("#alert-div").hide("slow");
-                });
+                Notify("Invalid Telegram message link provided.", "bg-danger text-white");
             }
         });
-        function sleep (time) {
-            return new Promise((resolve) => setTimeout(resolve, time));
-        }
     </script>
 </body>
 </html>

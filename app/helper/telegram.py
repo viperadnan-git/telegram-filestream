@@ -2,8 +2,8 @@ import math
 import asyncio
 from telethon import utils
 from telethon.tl import types
-from app.utils import humanbytes, get_file_name
 from app import client, results_per_page
+from app.helper.utils import humanbytes, get_file_name
 
 
 async def get_chat_messages(chat_id, offset:int, search_query=None):
@@ -40,10 +40,7 @@ async def get_chat_messages(chat_id, offset:int, search_query=None):
     return results, getattr(messages[0].chat, "title", getattr(messages[0].chat, "first_name", chat_id)) if len(messages) > 0 else chat_id 
 
 async def get_message(chat_id, message_id:int):
-    try:
-        message = await client.get_messages(entity=chat_id, ids=message_id)
-    except:
-        return None
+    message = await client.get_messages(entity=chat_id, ids=message_id)
     reply_btns = []
     if message.reply_markup:
         if isinstance(message.reply_markup, types.ReplyInlineMarkup):
