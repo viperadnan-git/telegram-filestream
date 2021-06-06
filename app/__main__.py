@@ -17,34 +17,34 @@ async def app():
         middlewares = [middleware]
       
     app = web.Application(middlewares=middlewares)
-    app["auth"] = authorization
     aiohttp_jinja2.setup(app,
         loader=jinja2.FileSystemLoader(
             'assets'
             )
         )
     
+    app["auth"] = authorization
     app['chats'] = {}
 
-    if tg_settings['all']:
+    if tg_settings.get("all", False):
         async for chat in client.iter_dialogs():
-            if chat.id in tg_settings['exclude']:
+            if chat.id in tg_settings.get('exclude', []):
                 continue
-            if not chat.id in tg_settings['include']:
-                if isinstance(chat.entity, User) and not tg_settings['private']:
+            if not chat.id in tg_settings.get('include', []):
+                if isinstance(chat.entity, User) and not tg_settings.get('private', False):
                     continue
-                elif isinstance(chat.entity, Channel) and not tg_settings['channel']:
+                elif isinstance(chat.entity, Channel) and not tg_settings.get('channel', False):
                     continue
-                elif isinstance(chat.entity, Chat) and not tg_settings['group']:
+                elif isinstance(chat.entity, Chat) and not tg_settings.get('group', False):
                     continue
             alias = await generate_alias(chat)
             app['chats'][alias['alias_id']] = alias
     else:
-        for chat_id in tg_settings['include']:
+        for chat_id in tg_settings.get('include', []):
             chat = await client.get_entity(chat_id)
             alias = await generate_alias(chat)
             app['chats'][alias['alias_id']] = alias
-        
+      
     for alias_id in app['chats'].keys():
         chat = "{chat:" + alias_id + "}"
         routes.extend([

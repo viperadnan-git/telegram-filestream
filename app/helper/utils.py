@@ -1,6 +1,5 @@
 import hmac
 import hashlib
-import secrets
 from app import secret_key
 
 algorithm = hashlib.sha256
@@ -42,6 +41,6 @@ async def get_chat_name(chat):
 async def generate_alias(chat):
     return {
         'chat_id':chat.id,
-        'alias_id':secrets.token_urlsafe(8),
+        'alias_id':hmac.new(secret_key, str(chat.id).encode('utf-8'), hashlib.md5).hexdigest(),
         'title':await get_chat_name(chat)
     }

@@ -50,7 +50,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" onclick="openInTelegram('{{id}}')">Open in Telegram</a>
+                        <a class="nav-link active" href="/">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="https://viperadnan-git.github.io">Contact</a>
@@ -109,17 +109,6 @@
     </footer>
     <script>
         const player = new Plyr('#player');
-        function openInTelegram(id) {
-            let id_parts = id.split("/");
-            window.location.href = `https://t.me/${parseTgId(id_parts[1])}/${id_parts[2]}`;
-        }
-        function parseTgId(id) {
-            if (!isNaN(id)) {
-                return `c/${id}`
-            } else {
-                return id
-            }
-        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
 </body>
