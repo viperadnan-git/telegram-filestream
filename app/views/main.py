@@ -4,11 +4,8 @@ from app import announcement
 
 @aiohttp_jinja2.template("main.html")
 async def Main(request):
-    chats = request.app['chats']
-    if len(chats) == 1:
-        return web.HTTPFound("/"+list(chats.values())[0]['alias_id'])
     return {
-        "chats": list(chats.values()),
+        "chats": list(request.app['chats'].values()),
         "auth" : request.app["auth"],
         "announcement" : announcement
     }
