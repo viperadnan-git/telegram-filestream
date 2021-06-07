@@ -5,7 +5,7 @@ from app.utils import get_file_name, encrypt
 from telethon import utils, events
 
 async def register_handler():
-    @client.on(events.NewMessage)
+    @client.on(events.NewMessage(incoming=True))
     async def handle_message(evt: events.NewMessage.Event) -> None:
         if not evt.is_private:
             return
@@ -13,7 +13,7 @@ async def register_handler():
             await evt.reply("<b>Send any document 📁🗂️🎥🎤🖼️ to get direct download link.</b>")
             return
         msg = await client.send_message(chat_id, evt.message)
-        url = f"{public_url}/{await encrypt(str(msg.id))}/{await get_file_name(evt)}"
+        url = f"{public_url}/{await encrypt(str(msg.id))}"
         await evt.reply(f"<b>🔗 Link to download file:</b> <a href='{url}'>{url}</a>")
 
 
