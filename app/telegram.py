@@ -1,7 +1,21 @@
 import math
 import asyncio
-from app import client
-from telethon import utils
+from app import client, public_url, chat_id
+from app.utils import get_file_name, encrypt
+from telethon import utils, events
+
+async def register_handler():
+    @client.on(events.NewMessage)
+    async def handle_message(evt: events.NewMessage.Event) -> None:
+        if not evt.is_private:
+            return
+        if not evt.file:
+            await evt.reply("<b>Send any document 📁🗂️🎥🎤🖼️ to get direct download link.</b>")
+            return
+        msg = await client.send_message(chat_id, evt.message)
+        url = f"{public_url}/{await encrypt(str(msg.id))}/{await get_file_name(evt)}"
+        await evt.reply(f"<b>🔗 Link to download file:</b> <a href='{url}'>{url}</a>")
+
 
 async def download(file, file_size, offset, limit):
         part_size_kb = utils.get_appropriated_part_size(file_size)
