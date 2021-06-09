@@ -76,6 +76,7 @@ async def get_message(chat_id, message_id:int):
 async def download(file, file_size, offset, limit):
         part_size_kb = utils.get_appropriated_part_size(file_size)
         part_size = int(part_size_kb * 1024)
+        offset -= offset % part_size
         first_part_cut = offset % part_size
         first_part = math.floor(offset / part_size)
         last_part_cut = part_size - (limit % part_size)
