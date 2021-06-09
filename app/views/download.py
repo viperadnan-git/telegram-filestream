@@ -36,13 +36,18 @@ class Download(web.View):
         media = message.media
         size = message.file.size
         file_name = self.request.match_info.get("filename") or await get_file_name(message)
-        mime_type = message.file.mime_type
 
         try:
-            offset = self.request.http_range.start or 0
-            limit = self.request.http_range.stop or size
+            range_header = self.request.headers.get('Range', 0)
+            if range_header:
+                offset, limit = range_header.replace('bytes=', '').split('-')
+                offset = int(offset)
+                limit = int(limit) if limit else size
+            else:
+                offset = self.request.http_range.start or 0
+                limit = self.request.http_range.stop or size
             if (limit > size) or (offset < 0) or (limit < offset):
-                raise ValueError("range not in acceptable format")
+                raise ValueError("Range not in acceptable format")
         except ValueError:
             return web.Response(
                 status=416,
@@ -56,12 +61,14 @@ class Download(web.View):
             body = download(media, size, offset, limit)
             print(f"Serving file in {message.id} (chat {chat_id}) ; Range: {offset} - {limit}")
 
-        headers = {
-            "Content-Type": mime_type,
-            "Content-Range": f"bytes {offset}-{limit}/{size}",
-            "Content-Length": str(limit - offset),
-            "Accept-Ranges": "bytes",
-            "Content-Disposition": f'attachment; filename="{file_name}"',
-        }
-
-        return web.Response(status=206 if offset else 200, body=body, headers=headers)
+        return web.Response(
+            status=206 if offset else 200,
+            body=body,
+            headers={
+                "Content-Type": message.file.mime_type,
+                "Content-Range": f"bytes {offset}-{limit}/{size}",
+                "Content-Length": str(size),
+                "Accept-Ranges": "bytes",
+                "Content-Disposition": f'attachment; filename="{file_name}"',
+            }
+        )
