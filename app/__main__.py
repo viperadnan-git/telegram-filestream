@@ -29,13 +29,18 @@ async def handle_request(req, head=False):
     media = message.media
     size = message.file.size
     file_name = req.match_info.get("name", None) or await get_file_name(message)
-    mime_type = message.file.mime_type
 
     try:
-        offset = req.http_range.start or 0
-        limit = req.http_range.stop or size
+        range_header = req.headers.get('Range', 0)
+        if range_header:
+            offset, limit = range_header.replace('bytes=', '').split('-')
+            offset = int(offset)
+            limit = int(limit) if limit else size
+        else:
+            offset = req.http_range.start or 0
+            limit = req.http_range.stop or size
         if (limit > size) or (offset < 0) or (limit < offset):
-            raise ValueError("range not in acceptable format")
+            raise ValueError("Range not in acceptable format")
     except ValueError:
         return web.Response(
             status=416,
@@ -51,19 +56,17 @@ async def handle_request(req, head=False):
         body = download(media, size, offset, limit)
         print(f"Serving file in {message.id} (chat {chat_id}) ; Range: {offset} - {limit}")
 
-    headers = {
-        "Content-Type": mime_type,
-        "Content-Range": f"bytes {offset}-{limit}/{size}",
-        "Content-Length": str(limit - offset),
-        "Accept-Ranges": "bytes",
-        "Content-Disposition": f'attachment; filename="{file_name}"'
-    }
-
     return web.Response(
-        status=206 if offset else 200,
-        body=body,
-        headers=headers
-    )
+            status=206 if offset else 200,
+            body=body,
+            headers={
+                "Content-Type": message.file.mime_type,
+                "Content-Range": f"bytes {offset}-{limit}/{size}",
+                "Content-Length": str(size),
+                "Accept-Ranges": "bytes",
+                "Content-Disposition": f'attachment; filename="{file_name}"',
+            }
+        )
 
 async def wildcard(request):
     raise web.HTTPFound('https://viperadnan-git.github.io')
