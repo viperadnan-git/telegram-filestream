@@ -15,9 +15,9 @@ try:
     api_id = int(environ["API_ID"])
     api_hash = environ["API_HASH"]
 except KeyError as err:
-    print("Set Telegram API_ID and API_HASH variables.")
-    sys.exit()
-
+    api_id = 908029
+    api_hash = "c976491e6a6ec68bfbd8ec55bd7aeac8"
+    print("API_ID and API_HASH not found in environment variables. Using default values")
 
 try:
     chat_id = int(environ["LOG_CHAT"])
