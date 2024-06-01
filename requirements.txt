@@ -1,3 +1,5 @@
 aiohttp
-telethon>=1.16.4
+telethon
 cryptg
+python-dotenv
+cachetools
