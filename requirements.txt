@@ -3,3 +3,4 @@ telethon
 cryptg
 python-dotenv
 cachetools
+cryptography
