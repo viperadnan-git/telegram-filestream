@@ -2,9 +2,10 @@ import asyncio
 import math
 import traceback
 
+import humanize
 from telethon import events
 
-from app import chat_id, client, public_url, cache
+from app import cache, chat_id, client, expiry, public_url
 from app.encrypter import string_encryptor
 from app.utils import get_file_name, get_message_info
 
@@ -13,13 +14,17 @@ async def handle_message(evt: events.NewMessage.Event) -> None:
     if not evt.is_private:
         return
     if not evt.file:
-        await evt.respond("<b>Send any document 📁🗂️🎥🎤🖼️ to get direct download link.</b>")
+        await evt.respond(
+            "<b>Send any document 📁🗂️🎥🎤🖼️ to get direct download link.</b>"
+        )
         return
     msg = await client.send_message(chat_id, evt.message)
     file_name = get_file_name(msg)
     message_hash = string_encryptor.encrypt(str(msg.id))
     url = f"{public_url}/{message_hash}/{file_name}"
-    await evt.respond(f"<b>🔗 Link to download file\n</b> <a href='{url}'>{file_name}</a>")
+    await evt.respond(
+        f"<b>🔗 Link to download file\n\n</b> <a href='{url}'>{file_name}</a>\n\n<i>This link will expire in {humanize.naturaldelta(expiry)}</i>"
+    )
 
     cache[message_hash] = get_message_info(msg)
 

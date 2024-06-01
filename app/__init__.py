@@ -1,9 +1,11 @@
 import sys
 from os import environ
 
+from cachetools import LRUCache
 from dotenv import load_dotenv
 from telethon.sync import TelegramClient
-from cachetools import LRUCache
+
+from .utils import convert_to_seconds
 
 load_dotenv()
 
@@ -17,7 +19,9 @@ try:
 except KeyError as err:
     api_id = 908029
     api_hash = "c976491e6a6ec68bfbd8ec55bd7aeac8"
-    print("API_ID and API_HASH not found in environment variables. Using default values")
+    print(
+        "API_ID and API_HASH not found in environment variables. Using default values"
+    )
 
 try:
     chat_id = int(environ["LOG_CHAT"])
@@ -26,7 +30,8 @@ except:
     sys.exit()
 
 bot_token = environ.get("BOT_TOKEN", None)
-cache = LRUCache(maxsize=1024)
+expiry = convert_to_seconds(environ.get("EXPIRY", "8h"))
+cache = LRUCache(maxsize=int(environ.get("CACHE_SIZE", 1000)))
 
 if bot_token:
     client = TelegramClient("bot", api_id=api_id, api_hash=api_hash)

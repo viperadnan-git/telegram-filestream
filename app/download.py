@@ -1,9 +1,10 @@
 from aiohttp import web
 
-from app import chat_id, client, cache
+from app import cache, chat_id, client, expiry
 from app.encrypter import string_encryptor
 from app.telegram import download
 from app.utils import get_message_info
+
 
 class Download(web.View):
     async def get(self):
@@ -17,7 +18,7 @@ class Download(web.View):
             return cache[message_hash]
 
         try:
-            message_id = int(string_encryptor.decrypt(message_hash))
+            message_id = int(string_encryptor.decrypt(message_hash, ttl=expiry))
             print(f"Getting message: {message_id} in {chat_id}")
             message = await client.get_messages(entity=chat_id, ids=message_id)
 
@@ -36,7 +37,7 @@ class Download(web.View):
 
         if not message_info:
             return web.Response(status=404, text="404: Not Found")
-        
+
         message_id, media, size, mime_type, file_name = message_info
 
         try:
