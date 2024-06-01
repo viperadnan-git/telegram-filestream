@@ -40,7 +40,7 @@ class Download(web.View):
         message_id, media, size, mime_type, file_name = message_info
 
         try:
-            range_header = self.request.headers.get("Range", 0)
+            range_header = self.request.headers.get("Range")
             if range_header:
                 offset, limit = range_header.replace("bytes=", "").split("-")
                 offset = int(offset)
@@ -50,10 +50,10 @@ class Download(web.View):
                 limit = self.request.http_range.stop or size
             if (limit > size) or (offset < 0) or (limit < offset):
                 raise ValueError("Range not in acceptable format")
-        except ValueError:
+        except ValueError as err:
             return web.Response(
                 status=416,
-                text="416: Range Not Satisfiable" if not head else None,
+                text=f"416: {err}" if not head else None,
                 headers={"Content-Range": f"bytes */{size}"},
             )
 

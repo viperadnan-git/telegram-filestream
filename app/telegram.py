@@ -2,7 +2,7 @@ import asyncio
 import math
 import traceback
 
-from telethon import events, utils
+from telethon import events
 
 from app import chat_id, client, public_url, cache
 from app.encrypter import string_encryptor
@@ -13,13 +13,13 @@ async def handle_message(evt: events.NewMessage.Event) -> None:
     if not evt.is_private:
         return
     if not evt.file:
-        await evt.reply("<b>Send any document 📁🗂️🎥🎤🖼️ to get direct download link.</b>")
+        await evt.respond("<b>Send any document 📁🗂️🎥🎤🖼️ to get direct download link.</b>")
         return
     msg = await client.send_message(chat_id, evt.message)
     file_name = get_file_name(msg)
     message_hash = string_encryptor.encrypt(str(msg.id))
     url = f"{public_url}/{message_hash}/{file_name}"
-    await evt.reply(f"<b>🔗 Link to download file:</b> <a href='{url}'>{file_name}</a>")
+    await evt.respond(f"<b>🔗 Link to download file\n</b> <a href='{url}'>{file_name}</a>")
 
     cache[message_hash] = get_message_info(msg)
 
@@ -29,9 +29,7 @@ async def register_handler():
 
 
 async def download(file, file_size, offset, limit):
-    part_size_kb = utils.get_appropriated_part_size(file_size)
-    part_size = int(part_size_kb * 1024)
-    offset -= offset % part_size
+    part_size = 512 * 1024
     first_part_cut = offset % part_size
     first_part = math.floor(offset / part_size)
     last_part_cut = part_size - (limit % part_size)
@@ -44,7 +42,7 @@ async def download(file, file_size, offset, limit):
         ):
             if part == first_part:
                 yield chunk[first_part_cut:]
-            elif part == last_part - 1:
+            elif part == last_part:
                 yield chunk[:last_part_cut]
             else:
                 yield chunk
